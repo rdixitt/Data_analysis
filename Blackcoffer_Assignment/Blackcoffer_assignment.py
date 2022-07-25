@@ -1,12 +1,14 @@
 import pandas as pd
 from bs4 import BeautifulSoup
-import requests  # Requests using Python
+import requests 
 import re
 import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 
-nltk.download('stopwords')
 
 df = pd.read_excel('/content/Input.xlsx')
 links = df['URL'].values
