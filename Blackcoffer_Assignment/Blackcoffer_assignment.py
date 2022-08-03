@@ -1,31 +1,31 @@
 import pandas as pd
 from bs4 import BeautifulSoup
-import requests 
+import requests  # Requests using Python
 import re
 import nltk
-nltk.download('punkt')
-nltk.download('stopwords')
-
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
-
+nltk.download('punkt')
+nltk.download('stopwords')
 
 df = pd.read_excel('/content/Input.xlsx')
 links = df['URL'].values
 
-output = []
+
 
 
 # function to extract data
 
 def extract_data():
+    output = []
     # fetching data
     df = pd.read_excel('/content/Input.xlsx')
+    print(df)
     links = df['URL'].values
-    print(links)
-    for i in range(2, 152):
-        url = links[i]  # URL Fatching
-        url_id = i - 1
+    for i in range(150):
+        url = links[i]
+        # URL Fatching
+        url_id = i+1
 
         # URL Request
         page_request = requests.get(url, headers={"User-Agent": "XY"})
@@ -37,7 +37,6 @@ def extract_data():
 
         # title
         title_tag = soup.find('h1', class_="entry-title")
-        print(title_tag)
         title = title_tag.text.replace('\n', " ")
 
         # content
@@ -140,7 +139,7 @@ def extract_data():
         # Average Sentence Length = the number of words / the number of sentences
 
         average_sentence_length = num_words / num_sentences
-        print(average_sentence_length)
+        
 
         # 4  calculate Complex_Words consedring word not ending from "ed" or "es"
 
@@ -162,12 +161,12 @@ def extract_data():
 
         Complex_Word_Count = len(Complex_Words)
 
-        # Percentage of Complex Word = the number of complex words / the number of words
-        Percentage_of_Complex_Word = ((Complex_Word_Count) / (num_words)) * 100
+        # Percentage of Complex Words = the number of complex words / the number of words
+        Percentage_of_Complex_Words = ((Complex_Word_Count) / (num_words)) * 100
 
         # Fog Index = 0.4 * (Average Sentence Length + Percentage of Complex words)
 
-        Fog_Index = 0.4 * (average_sentence_length + (Percentage_of_Complex_words))
+        Fog_Index = 0.4 * (average_sentence_length + (Percentage_of_Complex_Words))
 
         # 6   Syllable Count Per Word
 
@@ -211,15 +210,15 @@ def extract_data():
         Average_Word_Length = (total_word_length) / (len(token_content))
 
         output.insert(i, [url_id, url, Positive_score, Negative_score, Polarity_score, Subjectivity_score,
-                          average_sentence_length, Percentage_of_Complex_Word,
+                          average_sentence_length, Percentage_of_Complex_Words,
 
                           Fog_Index, Average_Number_of_Words_Per_Sentence, Complex_Words, Word_Count, Syllable_Per_Word,
 
                           Personal_Pronouns, Average_Word_Length])
 
-
+    return(output)
 if __name__ == '__main__':
-    extract_data()
+    data = extract_data()
 
 df = pd.DataFrame(data,
                   columns=['URL ID', 'URL', 'POSITIVE SCORE', 'NEGATIVE SCORE', 'POLARITY SCORE', 'SUBJECTIVITY SCORE',
