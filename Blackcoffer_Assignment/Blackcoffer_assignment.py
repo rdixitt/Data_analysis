@@ -7,12 +7,11 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 nltk.download('punkt')
 nltk.download('stopwords')
+from google.colab import drive
+
 
 df = pd.read_excel('/content/Input.xlsx')
 links = df['URL'].values
-
-
-
 
 # function to extract data
 
@@ -20,7 +19,6 @@ def extract_data():
     output = []
     # fetching data
     df = pd.read_excel('/content/Input.xlsx')
-    print(df)
     links = df['URL'].values
     for i in range(150):
         url = links[i]
@@ -110,7 +108,8 @@ def extract_data():
                                       [word for word in positives]})
 
         # tokenizing
-        text_tokens = word_tokenize(content_without_punc.lower())
+        text_tokens_0 = word_tokenize(content_without_punc)
+        text_tokens = [x.lower() for x in text_tokens_0]
         # removing stopwords
         tokens_without_stops = [word for word in text_tokens if not word in my_stop_words_list]
         # Positive_score
@@ -175,9 +174,9 @@ def extract_data():
         # 3    Average Number of Words Per Sentence (with stopwords)
 
         # (the total number of words / the total number of sentences)
-        token_content = word_tokenize(content_initial)
+        total_number_of_words = len(text_tokens)
         total_number_of_sentences = len(sent_tokenize(content_initial))
-        total_number_of_words = len(token_content)
+        
 
         Average_Number_of_Words_Per_Sentence = (total_number_of_words) / (total_number_of_sentences)
 
@@ -192,33 +191,29 @@ def extract_data():
 
         # 7   calculate proper noun
 
-        Personal_Pronouns = []
-        personal_pn = ['I', 'i' 'we', 'We', 'WE', 'my', 'My', 'MY', 'ours', 'Ours', 'OURS', 'and', 'And', 'AND', 'us',
-                       'Us']
-
-        counter = 0
-
-        for word in token_content:
-            if word in personal_pn:
-                counter = 1
-        Personal_Pronouns.append(counter)
+        
+        personal_pn = ['I', 'i', 'we', 'We', 'WE', 'my', 'My', 'MY', 'ours', 'Ours', 'OURS', 'us', 'Us']
+        Personal_Pronouns = 0
+        for word in personal_pn:
+          if word in text_tokens_0:
+            Personal_Pronouns += 1
+         
 
         # 8   Average Word Length (formula : Sum of the total number of characters in each word/Total number of words)
         total_word_length = 0
-        for word in token_content:
-            total_word_length += len(word)
-        Average_Word_Length = (total_word_length) / (len(token_content))
+        for word in text_tokens:
+          total_word_length += len(word)
+        Average_Word_Length = (total_word_length) / (len(text_tokens))
 
         output.insert(i, [url_id, url, Positive_score, Negative_score, Polarity_score, Subjectivity_score,
+                          
                           average_sentence_length, Percentage_of_Complex_Words,
 
-                          Fog_Index, Average_Number_of_Words_Per_Sentence, Complex_Words, Word_Count, Syllable_Per_Word,
+                          Fog_Index, Average_Number_of_Words_Per_Sentence, Complex_Word_Count, Word_Count, Syllable_Per_Word,
 
                           Personal_Pronouns, Average_Word_Length])
-
     return(output)
-if __name__ == '__main__':
-    data = extract_data()
+data = extract_data()
 
 df = pd.DataFrame(data,
                   columns=['URL ID', 'URL', 'POSITIVE SCORE', 'NEGATIVE SCORE', 'POLARITY SCORE', 'SUBJECTIVITY SCORE',
@@ -226,4 +221,7 @@ df = pd.DataFrame(data,
                            'AVG NUMBER OF WORDS PER SENTENCE', 'COMPLEX WORD COUNT',
                            'WORD COUNT', 'SYLLABLE PER WORD', 'PERSONAL PRONOUNS', 'AVG WORD LENGTH'])
 
-df.to_excel('assignment_output.xlsx')
+
+drive.mount('/content/drive')
+with open('/content/drive/My Drive/Assignment/Blackcoffer/assignment_output.xlsx', 'w') as f:
+  df.to_csv(f)
