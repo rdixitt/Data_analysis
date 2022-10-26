@@ -15,39 +15,35 @@ options.add_argument('--disable-dev-shm-usage')
 
 from google.colab import drive 
 
-
-scraping_link = "https://www.noon.com/egypt-en/sports-and-outdoors/exercise-and-fitness/yoga-16328/"
-Additional_link = "?limit=50&page=1&sort%5Bby%5D=popularity&sort%5Bdir%5D=desc"
-
-#link generation for 61 pages
-
-def replaceTextBetween(Additional_link, delimeterA, delimeterB, replacement_pageN):
-      leadingText = Additional_link.split(delimeterA)[0]
-      trailingText = Additional_link.split(delimeterB)[1]
-
-      return leadingText + delimeterA + replacement_pageN + delimeterB + trailingText
-
-count = 1
+# empty list for scrap data
 product_link_list = []
 ean_sku_list = []
 rank_list = []
 
+position_1_list = []
+name_list = []
+brand_list = []
+average_rating_list = []
+rating_count_list = []
+currency_list = []
+price_list = []
+sales_price_list = []
+fbn_list = []
+store_name_list = []
+partner_rating_value_list = []
+partner_rating_count_list = []
+
 #loop for 61 pages
 
-for i in range(61):                                # iterating over number of pages you want to scrap
+headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win 64 ; x64) Apple WeKit /537.36(KHTML , like Gecko) Chrome/80.0.3987.162 Safari/537.36'}  #header for requests.get
 
-  #Creating link of each page for scraping
 
-  delimeterA = "&page="
-  delimeterB = "&sort%5Bby%5D=p"
-  modified_link = replaceTextBetween(Additional_link,delimeterA, delimeterB, str(count))    #Link of each page for scraping
-  count+=1
- 
- # Scraping
+for i in range(1, 62):                                # iterating over number of pages you want to scrap
 
-  response = requests.get(scraping_link + modified_link)  # get response from page 
-  urlinfo = response.content                 # get content of page
-  soup = BeautifulSoup(urlinfo, 'html.parser')  # Creating soup of content using beautiful
+   # Scraping
+  response = requests.get("https://www.noon.com/egypt-en/sports-and-outdoors/exercise-and-fitness/yoga-16328/?limit=50&page={}&sort%5Bby%5D=popularity&sort%5Bdir%5D=desc".format(i), headers = headers)    # get response from page 
+  urlinfo = response.content
+  soup = BeautifulSoup(urlinfo, 'html.parser')
 
   class1 = soup.find_all("span", class_="sc-5e739f1b-0 gEERDr wrapper productContainer ")     # find tag from soup content
   
@@ -83,19 +79,6 @@ for i in unique_ean_sku_set:
 
 
 # Position 1, Name, Brand, Average Rating, Rating Count, Currency, Price, Sales Price, FBN, Store Name, Partner Rating Value , Partner Rating Count
-
-position_1_list = []
-name_list = []
-brand_list = []
-average_rating_list = []
-rating_count_list = []
-currency_list = []
-price_list = []
-sales_price_list = []
-fbn_list = []
-store_name_list = []
-partner_rating_value_list = []
-partner_rating_count_list = []
 
 driver = webdriver.Chrome(options=options)   #chromedriver 
 
